@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcellus Panel</title>
+
+<style>
+    :root {
+        --primary: #67e8f9;
+        --accent: #c084fc;
+        --success: #4ade80;
+        --gold: #facc15;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: Arial, sans-serif;
+        background: #020617;
+        color: #fff;
+        overflow: hidden;
+    }
+
+    .bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    .bg::before, .bg::after {
+        content: "";
+        position: absolute;
+        width: 480px;
+        height: 480px;
+        filter: blur(140px);
+    }
+    .bg::before { background: rgba(103,232,249,0.4); top: -160px; left: -160px; }
+    .bg::after { background: rgba(192,132,252,0.4); bottom: -160px; right: -160px; }
+
+    /* ==================== LOGIN ==================== */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+    }
+    .card {
+        width: 100%;
+        max-width: 360px;
+        background: rgba(30,41,59,0.92);
+        padding: 32px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    input {
+        width: 100%;
+        padding: 14px;
+        margin: 12px 0;
+        border: none;
+        border-radius: 10px;
+        background: #0f172a;
+        color: #fff;
+        font-size: 16px;
+    }
+    button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 16px;
+    }
+    button:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    .hidden { display: none; }
+    #error { color: #f87171; margin-top: 10px; text-align: center; }
+
+    /* ==================== PANEL ==================== */
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: rgba(15,23,42,0.95);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #334155;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        border: 2px solid var(--primary);
+    }
+    .phone-number {
+        font-size: 15px;
+        color: #e2e8f0;
+    }
+
+    .balance-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .ksh {
+        background: linear-gradient(90deg, var(--gold), #eab308);
+        color: #ffffff;
+        padding: 6px 14px;           /* Smaller bubble */
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 14px;             /* Reduced to match code size */
+        box-shadow: 0 3px 10px rgba(250,204,21,0.4);
+    }
+    .balance {
+        font-size: 22px;             /* Reduced to match overall code */
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+
+    .panel {
+        background: rgba(15,23,42,0.92);
+        margin: 15px;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        border: 1px solid rgba(103,232,249,0.12);
+    }
+
+    .nav {
+        display: flex;
+        gap: 6px;
+        background: #1e2937;
+        padding: 8px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+    .nav button {
+        flex: 1;
+        padding: 12px 8px;
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        color: #94a3b8;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        transition: all 0.3s;
+    }
+    .nav button.active {
+        background: rgba(103,232,249,0.2);
+        color: var(--primary);
+        box-shadow: 0 0 15px rgba(103,232,249,0.4);
+    }
+    .nav button span { font-size: 18px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    h2 {
+        margin: 0 0 20px 0;
+        font-size: 24px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .logs {
+        background: #0f172a;
+        padding: 16px;
+        border-radius: 14px;
+        height: 160px;
+        overflow: auto;
+        font-size: 13.8px;
+        border: 1px solid rgba(103,232,249,0.1);
+    }
+    .logs div {
+        margin: 6px 0;
+        opacity: 0;
+        animation: logFade 0.5s forwards;
+    }
+    @keyframes logFade { to { opacity: 1; } }
+
+    .progress {
+        height: 10px;
+        background: #1e2937;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 25px 0;
+    }
+    .bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        box-shadow: 0 0 15px var(--primary);
+        transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .prompt {
+        padding: 16px;
+        background: #1e2937;
+        border-radius: 14px;
+        border-left: 5px solid var(--accent);
+        font-size: 15px;
+    }
+    .success {
+        color: var(--success);
+        font-weight: 600;
+        text-align: center;
+        margin: 15px 0;
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .withdraw-section {
+        text-align: center;
+        background: #1e2937;
+        padding: 30px 20px;
+        border-radius: 16px;
+    }
+    .whatsapp-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: #25D366;
+        color: #fff;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 20px auto 10px;
+        box-shadow: 0 6px 20px rgba(37,211,102,0.5);
+        transition: all 0.3s;
+    }
+    .whatsapp-btn:hover { transform: scale(1.05); }
+
+    .otp-input {
+        width: 100%;
+        padding: 15px;
+        margin: 20px 0;
+        border: none;
+        border-radius: 12px;
+        background: #0f172a;
+        color: #fff;
+        text-align: center;
+        font-size: 17px;
+    }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<!-- LOGIN PAGE (UNCHANGED) -->
+<div id="loginPage" class="container">
+  <div class="card">
+    <h2 style="text-align:center;margin-bottom:20px;">Marcellus Login</h2>
+    <input id="phone" placeholder="Phone Number" type="tel">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="handleLogin()">Login</button>
+    <p id="error"></p>
+  </div>
+</div>
+
+<!-- PANEL PAGE -->
+<div id="panelPage" class="hidden">
+  <div class="topbar">
+    <!-- Profile -->
+    <div class="profile">
+      <div class="avatar">👤</div>
+      <div>
+        <div style="font-weight:600;">User</div>
+        <div class="phone-number">0703114060</div>
+      </div>
+    </div>
+
+    <!-- Balance Section - Smaller KSH & Balance -->
+    <div class="balance-section">
+      <span class="ksh">KSH</span>
+      <span class="balance" id="balance">1,200</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <!-- Navigation -->
+    <div class="nav">
+      <button onclick="switchTab(0)" class="active" id="nav0"><span>🏠</span>Home</button>
+      <button onclick="switchTab(1)" id="nav1"><span>📋</span>Transactions</button>
+      <button onclick="switchTab(2)" id="nav2"><span>💰</span>Withdraw</button>
+      <button onclick="switchTab(3)" id="nav3"><span>⚙️</span>Settings</button>
+    </div>
+
+    <!-- Home Tab -->
+    <div id="tab0" class="tab-content active">
+      <h2>Control Panel</h2>
+      <div class="logs" id="logs"></div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div id="prompt" class="prompt"></div>
+      <div id="success" class="success"></div>
+      <button onclick="switchTab(2)" style="margin-top:15px;">Withdraw Funds</button>
+    </div>
+
+    <!-- Transactions Tab -->
+    <div id="tab1" class="tab-content">
+      <h2>📋 Transactions</h2>
+      <p style="color:#94a3b8;text-align:center;padding:60px 20px;">No transactions yet.<br><small>Your activity will appear here</small></p>
+    </div>
+
+    <!-- Withdraw Tab -->
+    <div id="tab2" class="tab-content">
+      <h2>💰 Withdraw Funds</h2>
+      <div class="withdraw-section">
+        <p style="color:#e2e8f0;font-size:15.5px;">Get your OTP from Admin via WhatsApp</p>
+        
+        <a href="https://wa.me/254105285185" target="_blank" style="text-decoration:none;">
+          <button class="whatsapp-btn">
+            <span style="font-size:28px;">💬</span>
+            Chat Admin on WhatsApp
+          </button>
+        </a>
+
+        <p style="margin:25px 0 10px;color:#facc15;">Enter OTP received:</p>
+        <input id="otpInput" class="otp-input" placeholder="••••" maxlength="4">
+        <button onclick="handleVerifyOTP()" id="verifyBtn">Verify OTP & Withdraw</button>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab3" class="tab-content">
+      <h2>⚙️ Settings</h2>
+      <p style="color:#94a3b8;text-align:center;padding:60px 20px;">Premium account settings coming soon</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============== UTILS ===============
+let audioContext;
+function playBeep() {
+    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    oscillator.frequency.value = 800;
+    oscillator.connect(audioContext.destination);
+    oscillator.start();
+    setTimeout(() => oscillator.stop(), 100);
+}
+
+// =============== STATE ===============
+let currentBalance = 1,200;
+
+// =============== AUTH ===============
+async function handleLogin() {
+    const phone = document.getElementById('phone').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const errorEl = document.getElementById('error');
+    const loginBtn = document.querySelector('#loginPage button');
+
+    errorEl.textContent = '';
+    loginBtn.textContent = 'Logging in...';
+    loginBtn.disabled = true;
+
+    if (!phone || !pass) {
+        errorEl.textContent = 'Please fill all fields';
+        loginBtn.textContent = 'Login';
+        loginBtn.disabled = false;
+        return;
+    }
+
+    await new Promise(r => setTimeout(r, 1200));
+
+    if (phone === '0703114060' && pass === '89606350') {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('panelPage').classList.remove('hidden');
+        startAnalysis();
+    } else {
+        errorEl.textContent = 'Invalid credentials';
+    }
+
+    loginBtn.textContent = 'Login';
+    loginBtn.disabled = false;
+}
+
+// =============== PANEL LOGIC ===============
+async function startAnalysis() {
+    const logs = document.getElementById('logs');
+    const bar = document.getElementById('bar');
+    const steps = [
+        'Initializing secure session...',
+        'Scanning HTTP headers...',
+        'Encrypting connection...',
+        'Validating credentials...',
+        'Checking firewall rules...',
+        'Analyzing traffic patterns...',
+        'Running malware detection...',
+        'Risk scoring AI module...',
+        'Verifying account integrity...'
+    ];
+
+    logs.innerHTML = '';
+
+    for (let i = 0; i < steps.length; i++) {
+        await new Promise(r => setTimeout(r, 750));
+        playBeep();
+
+        const div = document.createElement('div');
+        div.textContent = '> ' + steps[i];
+        logs.appendChild(div);
+        logs.scrollTop = logs.scrollHeight;
+
+        bar.style.width = ((i + 1) / steps.length * 100) + '%';
+    }
+
+    finishProcess();
+}
+
+function finishProcess() {
+    document.getElementById('prompt').textContent = 'Marcellus needs approval for you...';
+    setTimeout(() => {
+        const success = document.getElementById('success');
+        success.style.opacity = '1';
+        success.textContent = '✅ Account ready for withdrawal';
+        animateBalance();
+    }, 1200);
+}
+
+function animateBalance() {
+    const el = document.getElementById('balance');
+    let val = currentBalance;
+    const interval = setInterval(() => {
+        val += Math.floor(Math.random() * 60) + 15;
+        el.textContent = val.toLocaleString();
+    }, 90);
+    setTimeout(() => clearInterval(interval), 2300);
+}
+
+function switchTab(n) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById('tab' + n).classList.add('active');
+    document.getElementById('nav' + n).classList.add('active');
+}
+
+async function handleVerifyOTP() {
+    const otp = document.getElementById('otpInput').value.trim();
+    const btn = document.getElementById('verifyBtn');
+
+    if (!otp) {
+        alert('Please enter the OTP');
+        return;
+    }
+
+    btn.textContent = 'Verifying...';
+    btn.disabled = true;
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    if (otp === '8760') {
+        alert('✅ Withdrawal Successful!\nFunds have been processed.');
+        playBeep();
+        document.getElementById('otpInput').value = '';
+    } else {
+        alert('❌ Invalid OTP.\nPlease chat Admin on WhatsApp for the correct code.');
+    }
+
+    btn.textContent = 'Verify OTP & Withdraw';
+    btn.disabled = false;
+}
+</script>
+</body>
+</html>
