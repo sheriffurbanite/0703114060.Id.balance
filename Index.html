@@ -1,492 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marcellus Panel</title>
-
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - 0702084118</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
     :root {
-        --primary: #67e8f9;
-        --accent: #c084fc;
-        --success: #4ade80;
-        --gold: #facc15;
+      --gold: #d4af37;
+      --dark: #0a0a0a;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-        font-family: Arial, sans-serif;
-        background: #020617;
-        color: #fff;
-        overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .bg {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
+    /* LOGIN */
+    .login-container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    .bg::before, .bg::after {
-        content: "";
-        position: absolute;
-        width: 480px;
-        height: 480px;
-        filter: blur(140px);
-    }
-    .bg::before { background: rgba(103,232,249,0.4); top: -160px; left: -160px; }
-    .bg::after { background: rgba(192,132,252,0.4); bottom: -160px; right: -160px; }
-
-    /* ==================== LOGIN ==================== */
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        padding: 20px;
-    }
-    .card {
-        width: 100%;
-        max-width: 360px;
-        background: rgba(30,41,59,0.92);
-        padding: 32px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(15px);
+      padding: 40px 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(212,175,55,0.3);
+      text-align: center;
     }
     input {
-        width: 100%;
-        padding: 14px;
-        margin: 12px 0;
-        border: none;
-        border-radius: 10px;
-        background: #0f172a;
-        color: #fff;
-        font-size: 16px;
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
     }
     button {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        color: #000;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 16px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #d4af37, #f5e8a0);
+      color: black;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
     }
-    button:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-    .hidden { display: none; }
-    #error { color: #f87171; margin-top: 10px; text-align: center; }
 
-    /* ==================== PANEL ==================== */
+    /* TOPBAR */
     .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 20px;
-        background: rgba(15,23,42,0.95);
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 14px 18px;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(15px);
     }
-    .profile {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+
+    .avatar-box { position: relative; }
     .avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: #334155;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        border: 2px solid var(--primary);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(212,175,55,0.6);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.15), 0 6px 18px rgba(0,0,0,0.6);
     }
-    .phone-number {
-        font-size: 15px;
-        color: #e2e8f0;
-    }
-
-    .balance-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .ksh {
-        background: linear-gradient(90deg, var(--gold), #eab308);
-        color: #ffffff;
-        padding: 6px 14px;           /* Smaller bubble */
-        border-radius: 30px;
-        font-weight: bold;
-        font-size: 14px;             /* Reduced to match code size */
-        box-shadow: 0 3px 10px rgba(250,204,21,0.4);
-    }
-    .balance {
-        font-size: 22px;             /* Reduced to match overall code */
-        font-weight: 700;
-        color: #ffffff;
-        letter-spacing: -0.5px;
+    .status-dot {
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border: 2px solid #0a0a0a;
+      border-radius: 50%;
     }
 
-    .panel {
-        background: rgba(15,23,42,0.92);
-        margin: 15px;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-        border: 1px solid rgba(103,232,249,0.12);
+    .menu-icon, .bell-icon {
+      font-size: 24px;
+      color: var(--gold);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+    .menu-icon:hover, .bell-icon:hover { background: rgba(212,175,55,0.15); }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+      background: rgba(15,15,15,0.98); backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(212,175,55,0.25);
+      transition: 0.4s ease; z-index: 300; padding: 25px 20px;
+    }
+    .sidebar.active { left: 0; }
+
+    .menu-item {
+      padding: 16px 20px; margin-bottom: 8px; border-radius: 14px;
+      cursor: pointer; display: flex; align-items: center; gap: 12px;
+    }
+    .menu-item:hover { background: rgba(212,175,55,0.15); }
+
+    .content { padding: 20px; max-width: 1200px; margin: 0 auto; }
+
+    .card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(212,175,55,0.25);
+      backdrop-filter: blur(18px);
     }
 
-    .nav {
-        display: flex;
-        gap: 6px;
-        background: #1e2937;
-        padding: 8px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-    }
-    .nav button {
-        flex: 1;
-        padding: 12px 8px;
-        border: none;
-        border-radius: 12px;
-        background: transparent;
-        color: #94a3b8;
-        font-weight: 600;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        font-size: 12px;
-        transition: all 0.3s;
-    }
-    .nav button.active {
-        background: rgba(103,232,249,0.2);
-        color: var(--primary);
-        box-shadow: 0 0 15px rgba(103,232,249,0.4);
-    }
-    .nav button span { font-size: 18px; }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    h2 {
-        margin: 0 0 20px 0;
-        font-size: 24px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .balance-big {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .logs {
-        background: #0f172a;
-        padding: 16px;
-        border-radius: 14px;
-        height: 160px;
-        overflow: auto;
-        font-size: 13.8px;
-        border: 1px solid rgba(103,232,249,0.1);
+    /* TAB CONTROL */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease;
     }
-    .logs div {
-        margin: 6px 0;
-        opacity: 0;
-        animation: logFade 0.5s forwards;
+    .tab-content.active {
+      display: block;
     }
-    @keyframes logFade { to { opacity: 1; } }
-
-    .progress {
-        height: 10px;
-        background: #1e2937;
-        border-radius: 999px;
-        overflow: hidden;
-        margin: 25px 0;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .bar {
-        height: 100%;
-        width: 0%;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        box-shadow: 0 0 15px var(--primary);
-        transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-
-    .prompt {
-        padding: 16px;
-        background: #1e2937;
-        border-radius: 14px;
-        border-left: 5px solid var(--accent);
-        font-size: 15px;
-    }
-    .success {
-        color: var(--success);
-        font-weight: 600;
-        text-align: center;
-        margin: 15px 0;
-        opacity: 0;
-        transition: opacity 0.5s;
-    }
-
-    .withdraw-section {
-        text-align: center;
-        background: #1e2937;
-        padding: 30px 20px;
-        border-radius: 16px;
-    }
-    .whatsapp-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        background: #25D366;
-        color: #fff;
-        padding: 16px 24px;
-        border: none;
-        border-radius: 50px;
-        font-weight: bold;
-        font-size: 16px;
-        cursor: pointer;
-        margin: 20px auto 10px;
-        box-shadow: 0 6px 20px rgba(37,211,102,0.5);
-        transition: all 0.3s;
-    }
-    .whatsapp-btn:hover { transform: scale(1.05); }
-
-    .otp-input {
-        width: 100%;
-        padding: 15px;
-        margin: 20px 0;
-        border: none;
-        border-radius: 12px;
-        background: #0f172a;
-        color: #fff;
-        text-align: center;
-        font-size: 17px;
-    }
-</style>
+  </style>
 </head>
 <body>
 
-<div class="bg"></div>
-
-<!-- LOGIN PAGE (UNCHANGED) -->
-<div id="loginPage" class="container">
-  <div class="card">
-    <h2 style="text-align:center;margin-bottom:20px;">Marcellus Login</h2>
-    <input id="phone" placeholder="Phone Number" type="tel">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="handleLogin()">Login</button>
-    <p id="error"></p>
+  <!-- LOGIN -->
+  <div id="loginPage" class="login-container">
+    <div class="login-card">
+      <h2 style="color:var(--gold); margin-bottom:30px;">Personal Portal</h2>
+      <input type="tel" id="phoneInput" placeholder="Phone Number">
+      <input type="password" id="passInput" placeholder="Password">
+      <button onclick="login()">LOGIN</button>
+      <p id="loginError" style="color:#ff6b6b; margin-top:15px; display:none;">Invalid credentials</p>
+    </div>
   </div>
-</div>
 
-<!-- PANEL PAGE -->
-<div id="panelPage" class="hidden">
-  <div class="topbar">
-    <!-- Profile -->
-    <div class="profile">
-      <div class="avatar">👤</div>
-      <div>
-        <div style="font-weight:600;">User</div>
-        <div class="phone-number">0703114060</div>
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2 style="color:var(--gold);">Portal</h2>
+        <i class="fas fa-times" onclick="toggleMenu()" style="font-size:24px; cursor:pointer;"></i>
+      </div>
+
+      <div class="menu">
+        <div class="menu-item" onclick="switchTab(0)">🏠 Home</div>
+        <div class="menu-item" onclick="switchTab(1)">💰 Balance</div>
+        <div class="menu-item" onclick="switchTab(2)">📋 Transactions</div>
+        <div class="menu-item" onclick="switchTab(3)">⚙️ Settings</div>
       </div>
     </div>
 
-    <!-- Balance Section - Smaller KSH & Balance -->
-    <div class="balance-section">
-      <span class="ksh">KSH</span>
-      <span class="balance" id="balance">1,200</span>
-    </div>
-  </div>
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-  <div class="panel">
-    <!-- Navigation -->
-    <div class="nav">
-      <button onclick="switchTab(0)" class="active" id="nav0"><span>🏠</span>Home</button>
-      <button onclick="switchTab(1)" id="nav1"><span>📋</span>Transactions</button>
-      <button onclick="switchTab(2)" id="nav2"><span>💰</span>Withdraw</button>
-      <button onclick="switchTab(3)" id="nav3"><span>⚙️</span>Settings</button>
-    </div>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <i class="fas fa-bars menu-icon" onclick="toggleMenu()"></i>
 
-    <!-- Home Tab -->
-    <div id="tab0" class="tab-content active">
-      <h2>Control Panel</h2>
-      <div class="logs" id="logs"></div>
-      <div class="progress"><div class="bar" id="bar"></div></div>
-      <div id="prompt" class="prompt"></div>
-      <div id="success" class="success"></div>
-      <button onclick="switchTab(2)" style="margin-top:15px;">Withdraw Funds</button>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar-box">
+          <img src="https://picsum.photos/id/64/300/300" class="avatar">
+          <span class="status-dot"></span>
+        </div>
+        <div>
+          <div id="topPhone" style="font-weight:600;">0703114060</div>
+          <div style="font-size:12px; color:#aaa;">Active Account</div>
+        </div>
+      </div>
+
+      <i class="fas fa-bell bell-icon"></i>
     </div>
 
-    <!-- Transactions Tab -->
-    <div id="tab1" class="tab-content">
-      <h2>📋 Transactions</h2>
-      <p style="color:#94a3b8;text-align:center;padding:60px 20px;">No transactions yet.<br><small>Your activity will appear here</small></p>
-    </div>
+    <div class="content">
 
-    <!-- Withdraw Tab -->
-    <div id="tab2" class="tab-content">
-      <h2>💰 Withdraw Funds</h2>
-      <div class="withdraw-section">
-        <p style="color:#e2e8f0;font-size:15.5px;">Get your OTP from Admin via WhatsApp</p>
-        
-        <a href="https://wa.me/254105285185" target="_blank" style="text-decoration:none;">
-          <button class="whatsapp-btn">
-            <span style="font-size:28px;">💬</span>
-            Chat Admin on WhatsApp
-          </button>
-        </a>
+      <!-- HOME - Only Graph -->
+      <div id="content0" class="tab-content active">
+        <h1>Welcome back</h1>
+        <p style="color:#aaa; margin-bottom:30px;">Today</p>
+        <div class="card">
+          <h2>Balance Trend</h2>
+          <canvas id="balanceChart" height="160"></canvas>
+        </div>
+      </div>
 
-        <p style="margin:25px 0 10px;color:#facc15;">Enter OTP received:</p>
-        <input id="otpInput" class="otp-input" placeholder="••••" maxlength="4">
-        <button onclick="handleVerifyOTP()" id="verifyBtn">Verify OTP & Withdraw</button>
+      <!-- BALANCE -->
+      <div id="content1" class="tab-content">
+        <div class="card">
+          <h2>Total Available</h2>
+          <div class="balance-big">KSh 1,200</div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div id="content2" class="tab-content">
+        <div class="card">
+          <h2>Recent Transactions</h2>
+          <p style="color:#aaa; text-align:center; padding:100px 20px;">No transactions yet.</p>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="content3" class="tab-content">
+        <div class="card">
+          <h2>Edit Account</h2>
+          <p><strong>Phone Number</strong></p>
+          <input type="tel" id="setPhone" style="width:100%; padding:14px; margin:10px 0; border-radius:12px;">
+          <button onclick="saveSettings()" style="width:100%; padding:16px; background:var(--gold); color:black; border:none; border-radius:12px; font-weight:700;">Save Changes</button>
+        </div>
       </div>
     </div>
-
-    <!-- Settings Tab -->
-    <div id="tab3" class="tab-content">
-      <h2>⚙️ Settings</h2>
-      <p style="color:#94a3b8;text-align:center;padding:60px 20px;">Premium account settings coming soon</p>
-    </div>
   </div>
-</div>
 
-<script>
-// =============== UTILS ===============
-let audioContext;
-function playBeep() {
-    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    oscillator.frequency.value = 800;
-    oscillator.connect(audioContext.destination);
-    oscillator.start();
-    setTimeout(() => oscillator.stop(), 100);
-}
+  <script>
+    let chartInstance = null;
 
-// =============== STATE ===============
-let currentBalance = 1,200;
+    function login() {
+      const phone = document.getElementById("phoneInput").value.trim();
+      const pass = document.getElementById("passInput").value.trim();
 
-// =============== AUTH ===============
-async function handleLogin() {
-    const phone = document.getElementById('phone').value.trim();
-    const pass = document.getElementById('password').value.trim();
-    const errorEl = document.getElementById('error');
-    const loginBtn = document.querySelector('#loginPage button');
-
-    errorEl.textContent = '';
-    loginBtn.textContent = 'Logging in...';
-    loginBtn.disabled = true;
-
-    if (!phone || !pass) {
-        errorEl.textContent = 'Please fill all fields';
-        loginBtn.textContent = 'Login';
-        loginBtn.disabled = false;
-        return;
+      if (phone === "0703114060" && pass === "64506350") {
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        loadSavedSettings();
+        loadChart();
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
     }
 
-    await new Promise(r => setTimeout(r, 1200));
-
-    if (phone === '0703114060' && pass === '89606350') {
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('panelPage').classList.remove('hidden');
-        startAnalysis();
-    } else {
-        errorEl.textContent = 'Invalid credentials';
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("overlay").classList.toggle("active");
     }
 
-    loginBtn.textContent = 'Login';
-    loginBtn.disabled = false;
-}
-
-// =============== PANEL LOGIC ===============
-async function startAnalysis() {
-    const logs = document.getElementById('logs');
-    const bar = document.getElementById('bar');
-    const steps = [
-        'Initializing secure session...',
-        'Scanning HTTP headers...',
-        'Encrypting connection...',
-        'Validating credentials...',
-        'Checking firewall rules...',
-        'Analyzing traffic patterns...',
-        'Running malware detection...',
-        'Risk scoring AI module...',
-        'Verifying account integrity...'
-    ];
-
-    logs.innerHTML = '';
-
-    for (let i = 0; i < steps.length; i++) {
-        await new Promise(r => setTimeout(r, 750));
-        playBeep();
-
-        const div = document.createElement('div');
-        div.textContent = '> ' + steps[i];
-        logs.appendChild(div);
-        logs.scrollTop = logs.scrollHeight;
-
-        bar.style.width = ((i + 1) / steps.length * 100) + '%';
+    function switchTab(n) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById('content' + n).classList.add('active');
+      
+      // Close sidebar cleanly
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("overlay").classList.remove("active");
     }
 
-    finishProcess();
-}
-
-function finishProcess() {
-    document.getElementById('prompt').textContent = 'Marcellus needs approval for you...';
-    setTimeout(() => {
-        const success = document.getElementById('success');
-        success.style.opacity = '1';
-        success.textContent = '✅ Account ready for withdrawal';
-        animateBalance();
-    }, 1200);
-}
-
-function animateBalance() {
-    const el = document.getElementById('balance');
-    let val = currentBalance;
-    const interval = setInterval(() => {
-        val += Math.floor(Math.random() * 60) + 15;
-        el.textContent = val.toLocaleString();
-    }, 90);
-    setTimeout(() => clearInterval(interval), 2300);
-}
-
-function switchTab(n) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById('tab' + n).classList.add('active');
-    document.getElementById('nav' + n).classList.add('active');
-}
-
-async function handleVerifyOTP() {
-    const otp = document.getElementById('otpInput').value.trim();
-    const btn = document.getElementById('verifyBtn');
-
-    if (!otp) {
-        alert('Please enter the OTP');
-        return;
+    function saveSettings() {
+      const newPhone = document.getElementById("setPhone").value.trim();
+      if (newPhone) {
+        localStorage.setItem("savedPhone", newPhone);
+        document.getElementById("topPhone").textContent = newPhone;
+      }
     }
 
-    btn.textContent = 'Verifying...';
-    btn.disabled = true;
-
-    await new Promise(r => setTimeout(r, 1500));
-
-    if (otp === '8760') {
-        alert('✅ Withdrawal Successful!\nFunds have been processed.');
-        playBeep();
-        document.getElementById('otpInput').value = '';
-    } else {
-        alert('❌ Invalid OTP.\nPlease chat Admin on WhatsApp for the correct code.');
+    function loadSavedSettings() {
+      const saved = localStorage.getItem("savedPhone");
+      if (saved) {
+        document.getElementById("topPhone").textContent = saved;
+        document.getElementById("setPhone").value = saved;
+      } else {
+        document.getElementById("setPhone").value = "0703114060";
+      }
     }
 
-    btn.textContent = 'Verify OTP & Withdraw';
-    btn.disabled = false;
-}
-</script>
+    function loadChart() {
+      if (chartInstance) chartInstance.destroy();
+      
+      chartInstance = new Chart(document.getElementById('balanceChart'), {
+        type: 'line',
+        data: {
+          labels: ['Apr 10', 'Apr 12', 'Apr 14', 'Apr 16', 'Apr 17'],
+          datasets: [{
+            data: [850, 920, 1050, 1150, 1200],
+            borderColor: '#d4af37',
+            tension: 0.4,
+            borderWidth: 3
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false }}}
+      });
+    }
+
+    // Enter key support
+    document.addEventListener("keypress", function(e) {
+      if (e.key === "Enter" && document.getElementById("loginPage").style.display !== "none") {
+        login();
+      }
+    });
+  </script>
 </body>
-</html>
+        </html>
